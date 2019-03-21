@@ -1,6 +1,43 @@
 #include "ADS_lib.h"
 
 
+unsigned long type_size(TC_type data_type)
+{
+	switch (data_type)
+	{
+		case TC_BOOL_type:
+			return sizeof(TC_BOOL);
+		case TC_BYTE_type:
+			return sizeof(TC_BYTE);
+		case TC_WORD_type:
+			return sizeof(TC_WORD);
+		case TC_DWORD_type:
+			return sizeof(TC_DWORD);
+		case TC_INT_type:
+			return sizeof(TC_INT);
+		case TC_DINT_type:
+			return sizeof(TC_DINT);
+		case TC_LINT_type:
+			return sizeof(TC_LINT);
+		case TC_USINT_type:
+			return sizeof(TC_USINT);
+		case TC_UINT_type:
+			return sizeof(TC_UINT);
+		case TC_UDINT_type:
+			return sizeof(TC_UDINT);
+		case TC_ULINT_type:
+			return sizeof(TC_ULINT);
+		case TC_REAL_type:
+			return sizeof(TC_REAL);
+		case TC_LREAL_type:
+			return sizeof(TC_LREAL);
+		default:
+			return 0;
+	}
+
+
+}
+
 void ADS_stop_plc(PAmsAddr  pAddr)
 {
 	USHORT device_state = ADSSTATE_STOP;
@@ -14,20 +51,20 @@ void ADS_start_plc(PAmsAddr  pAddr)
 	AdsSyncWriteControlReq(pAddr, device_state, 0, 0, NULL);
 
 }
+    
 
-
-void ADS_init_var_INT(ADS_variable* var, const char* variable_name)
+void ADS_init_var_INT(ADS_variable* var, const char* variable_name,TC_type data_type)
 {
 	var->lHdlVar = 0;
-	var->data_type_size = sizeof(ADS_INT16);
-	var->data_pointer = malloc(var->data_type_size);
+	var->data_type_size = type_size(data_type);
+    var->data_type=data_type;
+	var->data_pointer = &var->TC_BYTE_data;
 	strcpy_s(var->name, variable_name);
 }
 
 void ADS_destroy_var(ADS_variable* var)
 {
-	free(var->data_pointer);
-	free(var);
+	delete var;
 }
 
 
