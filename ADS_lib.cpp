@@ -116,6 +116,10 @@ long ADS_variable_write_by_name(PAmsAddr  pAddr, const char* variable_name, void
 	nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, type_size, source_pointer);
 	if (nErr)
 		return nErr;
+	nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar);
+	if (nErr)
+		return nErr;
+
 	return 0;
 }
 
@@ -132,6 +136,10 @@ long ADS_variable_read_by_name(PAmsAddr  pAddr, const char* variable_name, void*
 	nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, type_size, target_pointer);
 	if (nErr)
 		return nErr;
+	nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &lHdlVar);
+	if (nErr)
+		return nErr;
+
 	return 0;
 }
 
