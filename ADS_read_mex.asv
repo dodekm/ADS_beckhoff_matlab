@@ -26,20 +26,15 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
       }
       else return;
      
-      
-       if(!mxIsChar(prhs[1]))
-           return;
-     
-      char* var_name= mxArrayToString(prhs[1]);
-      
+      char str[20]
+      str[i] = mxArrayToString(prhs[i]);
       
     //10, 3, 1, 138, 3, 1
     AmsAddr   Addr;
 	PAmsAddr  pAddr = &Addr;
 	ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
     ADS_variable var;
-	
-    ADS_init_var_INT(&var, var_name,TC_INT_type);
+	ADS_init_var_INT(&var, "GVL.vat",TC_INT_type);
     ADS_variable_read(pAddr, &var);
     
     
