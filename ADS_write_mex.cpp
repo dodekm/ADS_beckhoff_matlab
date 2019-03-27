@@ -12,8 +12,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
   
     
-    
-   if(nlhs!=0||nrhs!=3)
+   if(nlhs!=0||nrhs!=4)
     {
     mexErrMsgTxt("zly_pocet_vstupnych/vystupnych_argumentov");
     return;
@@ -21,7 +20,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
    
     const mxArray* mx_ipadress=prhs[0];
    const mxArray* mx_var_name=prhs[1];
-   const mxArray* mx_var_value=prhs[2];
+   const mxArray* mx_var_type=prhs[2];
+   const mxArray* mx_var_value=prhs[3];
     
       const mwSize *dims;
       dims = mxGetDimensions(mx_ipadress);
@@ -53,8 +53,14 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
       mexErrMsgTxt("zle_rozmery_vstupnej_hodnoty");
            return;
       }
+      if (!mxIsScalar(mx_var_type))
+      {
+      mexErrMsgTxt("zle_rozmery_vstupnej_hodnoty");
+           return;
+      }
+      
       double inValue = mxGetScalar(mx_var_value);
-     
+      TC_type type = (TC_type)mxGetScalar(mx_var_type);
       
     AmsAddr   Addr;
 	PAmsAddr  pAddr = &Addr;
@@ -65,9 +71,9 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     }
     
     ADS_variable var;
-    ADS_init_var_INT(&var, var_name,TC_INT_type);
+    ADS_init_var(&var, var_name,type);
+    ADS_var_value_set_double(&var,inValue);
     
-    var.TC_INT_data=inValue;
     
    if(ADS_variable_write(pAddr, &var))
    {
@@ -78,6 +84,5 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
    
     ADS_release_handler(pAddr, &var);
     ADS_deinit();
-    
-    
+   
 }

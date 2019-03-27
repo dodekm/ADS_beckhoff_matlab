@@ -1,0 +1,30 @@
+
+
+
+
+
+TC_BOOL_type=0
+TC_BYTE_type,
+TC_WORD_type,
+TC_DWORD_type,
+TC_INT_type,
+TC_DINT_type,
+TC_LINT_type,
+TC_USINT_type,
+TC_UINT_type,
+TC_UDINT_type,
+TC_ULINT_type,
+TC_REAL_type,
+TC_LREAL_type
+
+
+
+
+directory=pwd;
+mex ADS_read_mex.cpp ADS_lib.cpp -Lx:\Dropbox\FEI\OP\ADS_beckhoff_matlab -lTcAdsDll
+mex ADS_write_mex.cpp ADS_lib.cpp -Lx:\Dropbox\FEI\OP\ADS_beckhoff_matlab -lTcAdsDll
+
+%ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.tmp',0.5)
+%A=ADS_read_mex([10, 3, 1, 138, 3, 1],'GVL.tmp');
+
+

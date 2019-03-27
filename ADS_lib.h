@@ -1,9 +1,11 @@
 #pragma once
 #include <iostream>
+#include <string>
 #include <windows.h>
 #include <cstdio>
 #include <conio.h>
 #include <cstring>
+
 
 #include "TcAdsDef.h"
 #include "TcAdsApi.h"
@@ -43,7 +45,6 @@ TC_LREAL_type
 
 };
 
-
 typedef struct
 {
 	unsigned long			lHdlVar;
@@ -51,7 +52,7 @@ typedef struct
 	void*					data_pointer;
 	TC_type					data_type;
 	unsigned long			data_type_size;
-
+	
 	union
 	{
 		TC_BOOL TC_BOOL_data;
@@ -72,23 +73,38 @@ typedef struct
 }ADS_variable;
 
 
+template <typename	type>
+struct ADS_template_variable
+{
+	unsigned long			lHdlVar;
+	std::string				name;
+	type					data;
+};
+
+
 
 unsigned long type_size(TC_type data_type);
 
 AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6);
 long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short port);
-long ADS_variable_write_by_name(PAmsAddr  pAddr, const char* variable_name, void* source_pointer, unsigned int type_size);
-long ADS_variable_read_by_name(PAmsAddr  pAddr, const char* variable_name, void* target_pointer, unsigned int type_size);
+
+
 long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var);
 long ADS_variable_read(PAmsAddr  pAddr, ADS_variable* var);
-
-long ADS_variable_read_sumup(PAmsAddr  pAddr, const char* variable_name, void* target_pointer, unsigned int type_size);
-long ADS_variable_write_sumup(PAmsAddr  pAddr, const char* variable_name, void* target_pointer, unsigned int type_size);
-void ADS_print_error(long  nErr);
+void ADS_init_var(ADS_variable* var, const char* variable_name, TC_type data_type);
 long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var);
+
+double ADS_var_value_get_double(ADS_variable* var);
+void ADS_var_value_set_double(ADS_variable* var,double val);
+
+template <typename type> void ADS_init_var (ADS_template_variable<type>* var, const std::string variable_name);
+template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_variable<type>* var);
+template <typename type> long ADS_variable_read(PAmsAddr  pAddr, ADS_template_variable<type>*  var);
+template <typename type> long ADS_release_handler(PAmsAddr  pAddr, ADS_template_variable<type>*  var);
+
 void ADS_stop_plc(PAmsAddr  pAddr);
 void ADS_start_plc(PAmsAddr  pAddr);
-void ADS_init_var_INT(ADS_variable* var, const char* variable_name, TC_type data_type);
+
 void ADS_destroy_var(ADS_variable* var);
 long ADS_deinit();
 

@@ -11,7 +11,7 @@
 void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
 {
    
-    if(nlhs!=1||nrhs!=2)
+    if(nlhs!=1||nrhs!=3)
     {
     mexErrMsgTxt("zly_pocet_vstupnych/vystupnych_argumentov");
     return;
@@ -19,6 +19,8 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     
    const mxArray* mx_ipadress=prhs[0];
    const mxArray* mx_var_name=prhs[1];
+   const mxArray* mx_var_type=prhs[2];
+   
    mxArray* mx_var_value;
     
       const mwSize *dims;
@@ -45,6 +47,14 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
        }
       char* var_name= mxArrayToString(mx_var_name);
       
+      if (!mxIsScalar(mx_var_type))
+      {
+      mexErrMsgTxt("zle_rozmery_vstupnej_hodnoty");
+           return;
+      }
+      
+       TC_type type = (TC_type)mxGetScalar(mx_var_type);
+      
     AmsAddr   Addr;
 	PAmsAddr  pAddr = &Addr;
 	if(ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3))
@@ -52,8 +62,10 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         mexErrMsgTxt("ADS_connect_error");
         return;
     }
+    
+    
     ADS_variable var;
-    ADS_init_var_INT(&var, var_name,TC_INT_type);
+    ADS_init_var(&var, var_name,type);
    
    if(ADS_variable_read(pAddr, &var))
    {
@@ -64,9 +76,10 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     double *outMatrix; 
     mx_var_value = mxCreateDoubleScalar(0);
     outMatrix = mxGetPr(mx_var_value);
-    outMatrix[0]=(double)var.TC_INT_data;
+    outMatrix[0]=ADS_var_value_get_double(&var);
    
     plhs[0]= mx_var_value;
     ADS_release_handler(pAddr, &var);
+    
     
 }
