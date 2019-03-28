@@ -2,9 +2,8 @@
 #include <iostream>
 #include <string>
 #include <windows.h>
-#include <cstdio>
-#include <conio.h>
-#include <cstring>
+
+
 #include "TcAdsDef.h"
 #include "TcAdsApi.h"
 
@@ -40,7 +39,6 @@ TC_UDINT_type,
 TC_ULINT_type,
 TC_REAL_type,
 TC_LREAL_type
-
 };
 
 typedef struct
@@ -72,12 +70,90 @@ typedef struct
 
 
 template <typename	type>
-struct ADS_template_variable
+class ADS_template_variable
 {
+private:
+
+public:
+	
+
 	unsigned long			lHdlVar;
 	std::string				name;
 	type					data;
+
+	ADS_template_variable();
+	ADS_template_variable(const std::string variable_name);
+
+	long ADS_variable_write(PAmsAddr  pAddr);
+	long ADS_variable_read(PAmsAddr  pAddr);
+	long ADS_release_handler(PAmsAddr  pAddr);
+
 };
+
+
+template <typename	type>
+ADS_template_variable<type>::ADS_template_variable()
+{
+	lHdlVar = 0;
+	data = 0;
+	name = "";
+
+}
+
+
+
+template <typename	type>
+ADS_template_variable<type>::ADS_template_variable(const std::string variable_name)
+{
+	name = variable_name;
+	lHdlVar = 0;
+	data = 0;
+}
+
+template <typename	type>
+long ADS_template_variable<type>::ADS_variable_write(PAmsAddr  pAddr)
+{
+	long    nErr;
+
+	if (lHdlVar == 0)
+	{
+		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(lHdlVar), &(lHdlVar), name.length(), (void*)name.c_str());
+		if (nErr)
+			return nErr;
+	}
+	nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(type), (void*)&data);
+	if (nErr)
+		return nErr;
+	return 0;
+}
+
+template <typename	type>
+long ADS_template_variable<type>::ADS_variable_read(PAmsAddr  pAddr)
+{
+	long    nErr;
+
+	if (lHdlVar == 0)
+	{
+		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(lHdlVar), &(lHdlVar), name.length(), (void*)name.c_str());
+		if (nErr)
+			return nErr;
+	}
+	nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, lHdlVar, sizeof(type), (void*)&data);
+	if (nErr)
+		return nErr;
+	return 0;
+}
+
+template <typename	type>
+long ADS_template_variable<type>::ADS_release_handler(PAmsAddr  pAddr)
+{
+
+	long    nErr;
+	nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(lHdlVar), &(lHdlVar));
+	lHdlVar = 0;
+	return nErr;
+
+}
 
 unsigned long type_size(TC_type data_type);
 
@@ -92,14 +168,15 @@ long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var);
 double ADS_var_value_get_double(ADS_variable* var);
 void ADS_var_value_set_double(ADS_variable* var,double val);
 
-template <typename type> void ADS_init_var (ADS_template_variable<type>& var, const std::string variable_name);
-template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_variable<type>& var);
-template <typename type> long ADS_variable_read(PAmsAddr  pAddr, ADS_template_variable<type>&  var);
-template <typename type> long ADS_release_handler(PAmsAddr  pAddr, ADS_template_variable<type>&  var);
-
 void ADS_stop_plc(PAmsAddr  pAddr);
 void ADS_start_plc(PAmsAddr  pAddr);
 
 void ADS_destroy_var(ADS_variable* var);
 long ADS_deinit();
+
+
+
+
+
+
 

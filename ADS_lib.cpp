@@ -35,7 +35,6 @@ unsigned long type_size(TC_type data_type)
 			return 0;
 	}
 
-
 }
 
 void ADS_stop_plc(PAmsAddr  pAddr)
@@ -51,7 +50,7 @@ void ADS_start_plc(PAmsAddr  pAddr)
 	AdsSyncWriteControlReq(pAddr, device_state, 0, 0, NULL);
 
 }
-    
+  
 
 AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6)
 {
@@ -153,37 +152,6 @@ long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var)
 
 
 
-template <typename type> void ADS_init_var(ADS_template_variable<type>&var ,const std::string variable_name)
-{
-	var.name = variable_name;
-	var.lHdlVar = 0;
-	var.data = 0;
-}
-
-template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_variable<type>& var)
-{
-	long    nErr;
-
-	if (var->lHdlVar == 0)
-	{
-		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), var->name.length(), (void*)var->name.c_str());
-		if (nErr)
-			return nErr;
-	}
-	nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_VALBYHND, var->lHdlVar, sizeof(type), var->data);
-	if (nErr)
-		return nErr;
-	return 0;
-}
-
-template <typename type> long ADS_variable_read(PAmsAddr  pAddr, ADS_template_variable<type>&  var)
-{
-
-}
-template <typename type> long ADS_release_handler(PAmsAddr  pAddr, ADS_template_variable<type>&  var)
-{
-
-}
 
 double ADS_var_value_get_double(ADS_variable* var)
 {
@@ -281,3 +249,4 @@ void ADS_var_value_set_double(ADS_variable* var, double val)
 
 	}
 }
+
