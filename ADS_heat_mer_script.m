@@ -28,6 +28,7 @@ N=floor(T_mer/Tvz);
 y=zeros(1,N);
 u=zeros(1,N);
 t=zeros(1,N);
+
 for i=1:N
 
     t(i)=i*Tvz;
@@ -38,6 +39,7 @@ for i=1:N
     pause(Tvz);
 
 end
+
 ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,0);
 ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,0);
 figure(); 

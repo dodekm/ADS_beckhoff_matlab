@@ -87,14 +87,15 @@ long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short p
 }
 
 
-void ADS_init_var(ADS_variable* var, const char* variable_name, TC_type data_type)
+void ADS_init_var(ADS_variable* var, const std::string variable_name, TC_type data_type)
 {
 	var->lHdlVar = 0;
 	var->data_type_size = type_size(data_type);
 	var->data_type = data_type;
 	var->data_pointer = &var->TC_LINT_data;
 	var->TC_LINT_data = 0;
-	strcpy_s(var->name, variable_name);
+	var->name = variable_name;
+
 }
 
 void ADS_destroy_var(ADS_variable* var)
@@ -109,7 +110,7 @@ long ADS_variable_read(PAmsAddr  pAddr, ADS_variable* var)
 
 	if (var->lHdlVar == 0)
 	{
-		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), strlen(var->name), (void*)var->name);
+		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), var->name.length(), (void*)var->name.c_str());
 		if (nErr)
 			return nErr;
 	}
@@ -125,7 +126,7 @@ long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var)
 
 	if (var->lHdlVar == 0)
 	{
-		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), strlen(var->name), (void*)var->name);
+		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), var->name.length(), (void*)var->name.c_str());
 		if (nErr)
 			return nErr;
 	}
@@ -152,14 +153,14 @@ long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var)
 
 
 
-template <typename type> void ADS_init_var(ADS_template_variable<type>*var ,const std::string variable_name)
+template <typename type> void ADS_init_var(ADS_template_variable<type>&var ,const std::string variable_name)
 {
-	var->name = variable_name;
-	var->lHdlVar = 0;
-	var->data = 0;
+	var.name = variable_name;
+	var.lHdlVar = 0;
+	var.data = 0;
 }
 
-template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_variable<type>* var)
+template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_variable<type>& var)
 {
 	long    nErr;
 
@@ -175,11 +176,11 @@ template <typename type> long ADS_variable_write(PAmsAddr  pAddr, ADS_template_v
 	return 0;
 }
 
-template <typename type> long ADS_variable_read(PAmsAddr  pAddr, ADS_template_variable<type>*  var)
+template <typename type> long ADS_variable_read(PAmsAddr  pAddr, ADS_template_variable<type>&  var)
 {
 
 }
-template <typename type> long ADS_release_handler(PAmsAddr  pAddr, ADS_template_variable<type>*  var)
+template <typename type> long ADS_release_handler(PAmsAddr  pAddr, ADS_template_variable<type>&  var)
 {
 
 }
