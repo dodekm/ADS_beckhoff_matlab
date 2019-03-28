@@ -199,10 +199,10 @@ double ADS_var_value_get_double(ADS_variable* var)
 		return (double)var->TC_WORD_data;
 		break;
 	case		TC_DWORD_type:
-		return (double)var->TC_INT_data;
+		return (double)var->TC_DWORD_data;
 		break;
 	case		TC_INT_type:
-		return (double)var->TC_DINT_data;
+		return (double)var->TC_INT_data;
 		break;
 	case		TC_DINT_type:
 		return (double)var->TC_DINT_data;

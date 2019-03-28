@@ -53,7 +53,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
            return;
       }
       
-       TC_type type = (TC_type)mxGetScalar(mx_var_type);
+       TC_type type =(TC_type)mxGetScalar(mx_var_type);
       
     AmsAddr   Addr;
 	PAmsAddr  pAddr = &Addr;
