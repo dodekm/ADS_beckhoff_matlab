@@ -248,10 +248,10 @@ void ADS_var_value_set_double(ADS_variable* var, double val)
 		var->TC_WORD_data=val;
 		break;
 	case		TC_DWORD_type:
-		var->TC_INT_data=val;
+		var->TC_DWORD_data=val;
 		break;
 	case		TC_INT_type:
-		var->TC_DINT_data=val;
+		var->TC_INT_data=val;
 		break;
 	case		TC_DINT_type:
 		var->TC_DINT_data=val;
