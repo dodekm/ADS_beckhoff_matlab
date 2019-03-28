@@ -22,7 +22,7 @@ spirala_name='GVL.spirala';
 snimac_name='GVL.snimac1';
 
 Tvz=1/10;
-T_mer=100;
+T_mer=60;
 N=floor(T_mer/Tvz);
 
 y=zeros(1,N);
@@ -41,12 +41,13 @@ end
 ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,0);
 ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,0);
 figure(); 
-plot(t,y)
+plot(t,y,'LineWidth',2)
 hold on
-plot(t,u)
+plot(t,u,'LineWidth',2)
 xlabel('time');
-ylabel('value');
-legend('temp','spirala');
+ylabel('raw INT value');
+legend('snimac','spirala');
+title('Prechodovka merana cez ADS')
 grid on;
 
 
