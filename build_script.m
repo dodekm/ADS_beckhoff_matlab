@@ -15,16 +15,16 @@ TC_LREAL_type=12
 
 directory=pwd;
 
-mex ADS_read_mex.cpp ADS_lib.cpp -Lx:\Dropbox\FEI\OP\ADS_beckhoff_matlab -lTcAdsDll
-mex ADS_write_mex.cpp ADS_lib.cpp -Lx:\Dropbox\FEI\OP\ADS_beckhoff_matlab -lTcAdsDll
+mex ADS_read_mex.cpp ADS_lib.cpp -LC:\Users\Admin\Desktop\ADS_beckhoff_matlab-master -lTcAdsDll
+mex ADS_write_mex.cpp ADS_lib.cpp -LC:\Users\Admin\Desktop\ADS_beckhoff_matlab-master -lTcAdsDll
 
 %ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.tmp',TC_INT_type,0.5)
 %A=ADS_read_mex([10, 3, 1, 138, 3, 1],'GVL.tmp',TC_INT_type);
-
+%%
 pause on 
 
 Tvz=1/10;
-T_mer=10;
+T_mer=20;
 N=floor(T_mer/Tvz);
 
 y=zeros(1,N);
@@ -33,12 +33,19 @@ u=zeros(1,N);
 for i=1:N
 
     u(i)=10;
-    ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.ventilator',TC_INT_type,u(i));
+    ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.ventilator',TC_INT_type,20000);
+    ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.spirala',TC_INT_type,i*100);
     y(i)=ADS_read_mex([10, 3, 1, 138, 3, 1],'GVL.snimac1',TC_INT_type);
     pause(Tvz);
 
 end
+ ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.ventilator',TC_INT_type,0);
+   ADS_write_mex([10, 3, 1, 138, 3, 1],'GVL.spirala',TC_INT_type,0);
 
+plot(y)
+hold on
+plot(u)
+grid on;
 
 
 
