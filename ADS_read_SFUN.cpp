@@ -14,11 +14,6 @@
 // its associated macro definitions.
 #include "simstruc.h"
 
-AmsAddr   Addr;
-PAmsAddr  pAddr = &Addr;
-ADS_variable var;
-
-
 // Function: mdlInitializeSizes ===============================================
 // Abstract:
 //    The sizes information is used by Simulink to determine the S-function
@@ -35,14 +30,6 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetNumDiscStates(S, 0);
     
     if (!ssSetNumInputPorts(S, 0)) return;
-    // ssSetInputPortWidth(S, 0, 1);
-    //  ssSetInputPortRequiredContiguous(S, 0, true); /*direct input signal access*/
-    /*
-     * Set direct feedthrough flag (1=yes, 0=no).
-     * A port has direct feedthrough if the input is used in either
-     * the mdlOutputs or mdlGetTimeOfNextVarHit functions.
-     */
-    //  ssSetInputPortDirectFeedThrough(S, 0, 1);
     
     if (!ssSetNumOutputPorts(S, 1)) return;
     ssSetOutputPortWidth(S, 0, 1);
@@ -50,7 +37,7 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
     ssSetNumIWork(S, 0);
-    ssSetNumPWork(S, 0);
+    ssSetNumPWork(S, 2);
     ssSetNumModes(S, 0);
     ssSetNumNonsampledZCs(S, 0);
     
@@ -89,8 +76,14 @@ static void mdlInitializeConditions(SimStruct *S)
 static void mdlStart(SimStruct *S)
 {
     
+    ssGetPWork(S)[0] = (void *) new AmsAddr;
+    ssGetPWork(S)[1] = (void *) new ADS_variable;
+    
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var= (ADS_variable*) ssGetPWork(S)[1];
+    
     ADS_init(pAddr, 0, ADS_create_ip(10, 3, 1, 138, 3, 1), AMSPORT_R0_PLC_TC3);
-    ADS_init_var(&var,"GVL.snimac1",TC_INT_type);
+    ADS_init_var(var,"GVL.snimac1",TC_INT_type);
     
 }
 
@@ -100,12 +93,14 @@ static void mdlStart(SimStruct *S)
 //   block.
 static void mdlOutputs(SimStruct *S,int_T tid)
 {
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
     
     // Get data addresses of I/O
     //InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
     real_T *y = ssGetOutputPortRealSignal(S, 0);
-    ADS_variable_read(pAddr, &var);
-    *y=ADS_var_value_get_double(&var);
+    ADS_variable_read(pAddr, var);
+    *y=ADS_var_value_get_double(var);
     
 }
 
@@ -160,8 +155,12 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-    ADS_release_handler(pAddr, &var);
-    ADS_deinit();
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    ADS_release_handler(pAddr, var);
+    
+    delete pAddr;
+    delete var;
     
 }
 

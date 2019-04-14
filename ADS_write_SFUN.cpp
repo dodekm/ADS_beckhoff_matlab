@@ -14,9 +14,7 @@
 // its associated macro definitions.
 #include "simstruc.h"
 
-AmsAddr   Addr;
-PAmsAddr  pAddr = &Addr;
-ADS_variable var;
+
 
 
 // Function: mdlInitializeSizes ===============================================
@@ -49,7 +47,7 @@ static void mdlInitializeSizes(SimStruct *S)
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
     ssSetNumIWork(S, 0);
-    ssSetNumPWork(S, 0);
+    ssSetNumPWork(S, 2);
     ssSetNumModes(S, 0);
     ssSetNumNonsampledZCs(S, 0);
     
@@ -88,8 +86,14 @@ static void mdlInitializeConditions(SimStruct *S)
 static void mdlStart(SimStruct *S)
 {
     
+    ssGetPWork(S)[0] = (void *) new AmsAddr;
+    ssGetPWork(S)[1] = (void *) new ADS_variable;
+    
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    
     ADS_init(pAddr, 0, ADS_create_ip(10, 3, 1, 138, 3, 1), AMSPORT_R0_PLC_TC3);
-    ADS_init_var(&var,"GVL.spirala",TC_INT_type);
+    ADS_init_var(var,"GVL.spirala",TC_INT_type);
     
 }
 
@@ -105,9 +109,12 @@ static void mdlOutputs(SimStruct *S,int_T tid)
 
 static void mdlUpdate(SimStruct *S,int_T tid)
 {
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    
     const real_T *u = ssGetInputPortRealSignal(S,0);
-    ADS_var_value_set_double(&var,*u);
-    ADS_variable_write(pAddr, &var);
+    ADS_var_value_set_double(var,*u);
+    ADS_variable_write(pAddr, var);
     
 }
 
@@ -153,8 +160,12 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-    ADS_release_handler(pAddr, &var);
-    ADS_deinit();
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
+    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    
+    ADS_release_handler(pAddr, var);
+    delete pAddr;
+    delete var;
 }
 
 // Required S-function trailer
