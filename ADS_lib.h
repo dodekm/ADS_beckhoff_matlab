@@ -3,7 +3,6 @@
 #include <string>
 #include <windows.h>
 
-
 #include "TcAdsDef.h"
 #include "TcAdsApi.h"
 
@@ -24,7 +23,6 @@ typedef double			TC_LREAL;
 
 
 enum TC_type {
-
 
 TC_BOOL_type,
 TC_BYTE_type,
@@ -73,13 +71,13 @@ template <typename	type>
 class ADS_template_variable
 {
 private:
-
-public:
+	unsigned long		lHdlVar;
+	std::string			name;
 	
 
-	unsigned long			lHdlVar;
-	std::string				name;
-	type					data;
+public:
+
+	type	data;
 
 	ADS_template_variable();
 	ADS_template_variable(const std::string variable_name);
@@ -87,6 +85,8 @@ public:
 	long ADS_variable_write(PAmsAddr  pAddr);
 	long ADS_variable_read(PAmsAddr  pAddr);
 	long ADS_release_handler(PAmsAddr  pAddr);
+	void set_double(double);
+	double get_double(void);
 
 };
 
@@ -101,13 +101,25 @@ ADS_template_variable<type>::ADS_template_variable()
 }
 
 
-
 template <typename	type>
 ADS_template_variable<type>::ADS_template_variable(const std::string variable_name)
 {
 	name = variable_name;
 	lHdlVar = 0;
 	data = 0;
+}
+
+template <typename	type>
+void ADS_template_variable<type>::set_double(double val)
+{
+	data = (type)val;
+}
+
+template <typename	type>
+double ADS_template_variable<type>::get_double(void)
+{
+
+	return (double)data;
 }
 
 template <typename	type>
@@ -155,8 +167,9 @@ long ADS_template_variable<type>::ADS_release_handler(PAmsAddr  pAddr)
 
 }
 
-unsigned long type_size(TC_type data_type);
 
+
+unsigned long TC_type_size(TC_type data_type);
 AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6);
 long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short port);
 

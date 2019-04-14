@@ -1,7 +1,7 @@
 #include "ADS_lib.h"
 
 
-unsigned long type_size(TC_type data_type)
+unsigned long TC_type_size(TC_type data_type)
 {
 	switch (data_type)
 	{
@@ -89,7 +89,7 @@ long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short p
 void ADS_init_var(ADS_variable* var, const std::string variable_name, TC_type data_type)
 {
 	var->lHdlVar = 0;
-	var->data_type_size = type_size(data_type);
+	var->data_type_size = TC_type_size(data_type);
 	var->data_type = data_type;
 	var->data_pointer = &var->TC_LINT_data;
 	var->TC_LINT_data = 0;
