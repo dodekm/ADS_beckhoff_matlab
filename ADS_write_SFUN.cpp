@@ -153,7 +153,6 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-    
     ADS_release_handler(pAddr, &var);
     ADS_deinit();
 }

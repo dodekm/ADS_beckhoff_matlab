@@ -70,7 +70,6 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
    if(ADS_variable_read(pAddr, &var))
    {
         mexErrMsgTxt("ADS_read_error");
-        ADS_deinit();
         return;
    }
     double *outMatrix; 

@@ -29,6 +29,8 @@ y=zeros(1,N);
 u=zeros(1,N);
 t=zeros(1,N);
 
+ADS_open_mex();
+
 for i=1:N
 
     t(i)=i*Tvz;
@@ -42,6 +44,7 @@ end
 
 ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,0);
 ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,0);
+ADS_close_mex();
 figure(); 
 plot(t,y,'LineWidth',2)
 hold on
