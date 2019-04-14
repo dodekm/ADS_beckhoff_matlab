@@ -93,12 +93,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
    
     // Retrieve C++ object from the pointers vector
  
-              const real_T *u = ssGetInputPortRealSignal(S,0);
-               real_T *y = ssGetOutputPortRealSignal(S, 0);
-              *y=-1;
-   ADS_var_value_set_double(&var,*u);
-   ADS_variable_write(pAddr, &var);
- 
+             
+             
 }
 
 /* Define to indicate that this S-Function has the mdlG[S]etSimState methods */
@@ -110,7 +106,12 @@ static void mdlOutputs(SimStruct *S, int_T tid)
  */
 static mxArray* mdlGetSimState(SimStruct* S)
 {
-    //Retrieve C++ object from the pointers vector
+   
+    const real_T *u = ssGetInputPortRealSignal(S,0);
+   ADS_var_value_set_double(&var,10);
+   ADS_variable_write(pAddr, &var);
+        
+//Retrieve C++ object from the pointers vector
     return mxCreateDoubleScalar(0);
 }
 /* Function: mdlGetSimState =====================================================
@@ -119,7 +120,8 @@ static mxArray* mdlGetSimState(SimStruct* S)
  */
 static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 {
-    // Retrieve C++ object from the pointers vector
+   
+// Retrieve C++ object from the pointers vector
    // DoubleAdder *da = static_cast<DoubleAdder*>(ssGetPWork(S)[0]);
    // da->SetPeak(mxGetPr(ma)[0]);
 }

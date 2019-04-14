@@ -22,7 +22,7 @@ spirala_name='GVL.spirala';
 snimac_name='GVL.snimac1';
 
 Tvz=1/10;
-T_mer=60;
+T_mer=10;
 N=floor(T_mer/Tvz);
 
 y=zeros(1,N);

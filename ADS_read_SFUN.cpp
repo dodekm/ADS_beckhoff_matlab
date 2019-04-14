@@ -90,7 +90,7 @@ static void mdlStart(SimStruct *S)
 {
     
     ADS_init(pAddr, 0, ADS_create_ip(10, 3, 1, 138, 3, 1), AMSPORT_R0_PLC_TC3);
-    ADS_init_var(&var,"GVL.snimac",TC_INT_type);	
+    ADS_init_var(&var,"GVL.snimac1",TC_INT_type);	
    
 }
 
@@ -106,6 +106,8 @@ static void mdlOutputs(SimStruct *S, int_T tid)
     // Get data addresses of I/O
     //InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
      real_T *y = ssGetOutputPortRealSignal(S, 0);
+
+     ADS_variable_read(pAddr, &var);
     *y=ADS_var_value_get_double(&var);
    
 }
@@ -162,7 +164,8 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 static void mdlTerminate(SimStruct *S)
 {
      ADS_release_handler(pAddr, &var);
-     
+     ADS_deinit();
+
 }
 
 // Required S-function trailer
