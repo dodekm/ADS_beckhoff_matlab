@@ -15,7 +15,17 @@
 #include "simstruc.h"
 
 
+#define N_PARAMS 2
 
+#define IP_ADRESS_IDX 0
+#define IP_ADRESS_PARAM(S) ssGetSFcnParam(S,IP_ADRESS_IDX)
+
+#define VAR_NAME_IDX  1
+#define VAR_NAME_PARAM(S) ssGetSFcnParam(S,VAR_NAME_IDX)
+
+
+#define VAR_TYPE_IDX  2
+#define VAR_TYPE_PARAM(S) ssGetSFcnParam(S,VAR_TYPE_IDX)
 
 // Function: mdlInitializeSizes ===============================================
 // Abstract:
@@ -23,7 +33,7 @@
 //    block's characteristics (number of inputs, outputs, states, etc.).
 static void mdlInitializeSizes(SimStruct *S)
 {
-    ssSetNumSFcnParams(S, 0);  /* Number of expected parameters */
+    ssSetNumSFcnParams(S, N_PARAMS);  /* Number of expected parameters */
     if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
         /* Return if number of expected != number of actual parameters */
         return;
@@ -92,8 +102,42 @@ static void mdlStart(SimStruct *S)
     PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
     ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
     
-    ADS_init(pAddr, 0, ADS_create_ip(10, 3, 1, 138, 3, 1), AMSPORT_R0_PLC_TC3);
-    ADS_init_var(var,"GVL.spirala",TC_INT_type);
+  
+    const mxArray* mx_ipadress=IP_ADRESS_PARAM(S);
+    const mxArray* mx_var_name=VAR_NAME_PARAM(S);
+    const mxArray* mx_var_type=VAR_TYPE_PARAM(S);
+    
+    const mwSize *dims;
+    dims = mxGetDimensions(mx_ipadress);
+    int rows = (int)dims[0];
+    int cols = (int)dims[1];
+    
+    double* netid;
+    
+    if(cols==6&&rows==1)
+    {
+        netid=mxGetPr(mx_ipadress);
+    }
+    else
+    {
+        return;
+    }
+    
+    if(!mxIsChar(mx_var_name))
+    {
+        return;
+        
+    }
+    char* var_name= mxArrayToString(mx_var_name);
+    
+    if (!mxIsScalar(mx_var_type))
+    {
+        return;
+    }
+    TC_type type = (TC_type)mxGetScalar(mx_var_type);
+    ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
+    ADS_init_var(var, var_name,type);
+    
     
 }
 

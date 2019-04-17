@@ -8,25 +8,11 @@
 #include "ADS_lib.h"
 
 #define S_FUNCTION_LEVEL 2
-#define S_FUNCTION_NAME  ADS_read_SFUN
+#define S_FUNCTION_NAME  ADS_setup_SFUN
 
 // Need to include simstruc.h for the definition of the SimStruct and
 // its associated macro definitions.
 #include "simstruc.h"
-
-
-#define N_PARAMS 2
-
-#define IP_ADRESS_IDX 0
-#define IP_ADRESS_PARAM(S) ssGetSFcnParam(S,IP_ADRESS_IDX)
-
-#define VAR_NAME_IDX  1
-#define VAR_NAME_PARAM(S) ssGetSFcnParam(S,VAR_NAME_IDX)
-
-
-#define VAR_TYPE_IDX  2
-#define VAR_TYPE_PARAM(S) ssGetSFcnParam(S,VAR_TYPE_IDX)
-
 
 // Function: mdlInitializeSizes ===============================================
 // Abstract:
@@ -34,7 +20,7 @@
 //    block's characteristics (number of inputs, outputs, states, etc.).
 static void mdlInitializeSizes(SimStruct *S)
 {
-   ssSetNumSFcnParams(S, N_PARAMS); 
+    ssSetNumSFcnParams(S, 0);  /* Number of expected parameters */
     if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
         /* Return if number of expected != number of actual parameters */
         return;
@@ -45,13 +31,13 @@ static void mdlInitializeSizes(SimStruct *S)
     
     if (!ssSetNumInputPorts(S, 0)) return;
     
-    if (!ssSetNumOutputPorts(S, 1)) return;
-    ssSetOutputPortWidth(S, 0, 1);
+    if (!ssSetNumOutputPorts(S, 0)) return;
+    
     
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
     ssSetNumIWork(S, 0);
-    ssSetNumPWork(S, 2);
+    ssSetNumPWork(S, 0);
     ssSetNumModes(S, 0);
     ssSetNumNonsampledZCs(S, 0);
     
@@ -90,46 +76,7 @@ static void mdlInitializeConditions(SimStruct *S)
 static void mdlStart(SimStruct *S)
 {
     
-    ssGetPWork(S)[0] = (void *) new AmsAddr;
-    ssGetPWork(S)[1] = (void *) new ADS_variable;
-    
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var= (ADS_variable*) ssGetPWork(S)[1];
-    
-    const mxArray* mx_ipadress=IP_ADRESS_PARAM(S);
-    const mxArray* mx_var_name=VAR_NAME_PARAM(S);
-    const mxArray* mx_var_type=VAR_TYPE_PARAM(S);
-    
-    const mwSize *dims;
-    dims = mxGetDimensions(mx_ipadress);
-    int rows = (int)dims[0];
-    int cols = (int)dims[1];
-    
-    double* netid;
-    
-    if(cols==6&&rows==1)
-    {
-        netid=mxGetPr(mx_ipadress);
-    }
-    else
-    {
-        return;
-    }
-    
-    if(!mxIsChar(mx_var_name))
-    {
-        return;
-        
-    }
-    char* var_name= mxArrayToString(mx_var_name);
-    
-    if (!mxIsScalar(mx_var_type))
-    {
-        return;
-    }
-    TC_type type = (TC_type)mxGetScalar(mx_var_type);
-    ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
-    ADS_init_var(var, var_name,type);
+   ADS_open();
     
 }
 
@@ -139,14 +86,7 @@ static void mdlStart(SimStruct *S)
 //   block.
 static void mdlOutputs(SimStruct *S,int_T tid)
 {
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
     
-    // Get data addresses of I/O
-    //InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
-    real_T *y = ssGetOutputPortRealSignal(S, 0);
-    ADS_variable_read(pAddr, var);
-    *y=ADS_var_value_get_double(var);
     
 }
 
@@ -201,13 +141,8 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
-    ADS_release_handler(pAddr, var);
-    
-    delete pAddr;
-    delete var;
-    
+   
+    ADS_close();
 }
 
 // Required S-function trailer
