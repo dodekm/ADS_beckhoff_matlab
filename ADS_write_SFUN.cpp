@@ -15,7 +15,7 @@
 #include "simstruc.h"
 
 
-#define N_PARAMS 2
+#define N_PARAMS 3
 
 #define IP_ADRESS_IDX 0
 #define IP_ADRESS_PARAM(S) ssGetSFcnParam(S,IP_ADRESS_IDX)
@@ -99,8 +99,8 @@ static void mdlStart(SimStruct *S)
     ssGetPWork(S)[0] = (void *) new AmsAddr;
     ssGetPWork(S)[1] = (void *) new ADS_variable;
     
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
+    ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
     
   
     const mxArray* mx_ipadress=IP_ADRESS_PARAM(S);
@@ -153,8 +153,8 @@ static void mdlOutputs(SimStruct *S,int_T tid)
 
 static void mdlUpdate(SimStruct *S,int_T tid)
 {
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
+    ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
     
     const real_T *u = ssGetInputPortRealSignal(S,0);
     ADS_var_value_set_double(var,*u);

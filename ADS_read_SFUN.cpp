@@ -1,12 +1,5 @@
 /* Copyright 2003-2014 The MathWorks, Inc. */
 
-#include <iostream>
-#include <windows.h>
-#include <conio.h>
-#include <cstdio>
-
-#include "ADS_lib.h"
-
 #define S_FUNCTION_LEVEL 2
 #define S_FUNCTION_NAME  ADS_read_SFUN
 
@@ -14,8 +7,15 @@
 // its associated macro definitions.
 #include "simstruc.h"
 
+#include <iostream>
+#include <windows.h>
+#include <conio.h>
+#include <cstdio>
 
-#define N_PARAMS 2
+#include "ADS_lib.h"
+
+
+#define N_PARAMS 3
 
 #define IP_ADRESS_IDX 0
 #define IP_ADRESS_PARAM(S) ssGetSFcnParam(S,IP_ADRESS_IDX)
@@ -74,28 +74,18 @@ static void mdlInitializeSampleTimes(SimStruct *S)
     ssSetModelReferenceSampleTimeDefaultInheritance(S);
 }
 
-static void mdlInitializeConditions(SimStruct *S)
-{
-    
-    
-}
-
-
-// Function: mdlStart =======================================================
-// Abstract:
-//   This function is called once at start of model execution. If you
-//   have states that should be initialized once, this is the place
-//   to do it.
+#define MDL_START  /* Change to #undef to remove function */
+#if defined(MDL_START) 
 
 static void mdlStart(SimStruct *S)
 {
+ 
+    PAmsAddr  pAddr = (AmsAddr*) new AmsAddr;
+    ADS_variable* var = (ADS_variable*) new ADS_variable;
     
-    ssGetPWork(S)[0] = (void *) new AmsAddr;
-    ssGetPWork(S)[1] = (void *) new ADS_variable;
-    
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var= (ADS_variable*) ssGetPWork(S)[1];
-    
+    ssSetPWorkValue(S, 0, (void *)pAddr);
+    ssSetPWorkValue(S, 1, (void *)var);
+       
     const mxArray* mx_ipadress=IP_ADRESS_PARAM(S);
     const mxArray* mx_var_name=VAR_NAME_PARAM(S);
     const mxArray* mx_var_type=VAR_TYPE_PARAM(S);
@@ -127,11 +117,17 @@ static void mdlStart(SimStruct *S)
     {
         return;
     }
+    
+    
     TC_type type = (TC_type)mxGetScalar(mx_var_type);
     ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
     ADS_init_var(var, var_name,type);
     
+    
+    
 }
+#endif 
+
 
 // Function: mdlOutputs =======================================================
 // Abstract:
@@ -139,14 +135,15 @@ static void mdlStart(SimStruct *S)
 //   block.
 static void mdlOutputs(SimStruct *S,int_T tid)
 {
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
+    ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
+   
     
     // Get data addresses of I/O
     //InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
     real_T *y = ssGetOutputPortRealSignal(S, 0);
     ADS_variable_read(pAddr, var);
-    *y=ADS_var_value_get_double(var);
+    //*y=ADS_var_value_get_double(var);
     
 }
 
@@ -157,42 +154,28 @@ static void mdlOutputs(SimStruct *S,int_T tid)
  *    for performing any tasks that should only take place once per
  *    integration step.
  */
+
+#define MDL_UPDATE  /* Change to #undef to remove function */
+#if defined(MDL_UPDATE)
 static void mdlUpdate(SimStruct *S, int_T tid)
 {
     
 }
-
+#endif
 /* Function: mdlDerivatives =================================================
  * Abstract:
  *    In this function, you compute the S-function block's derivatives.
  *    The derivatives are placed in the derivative vector, ssGetdX(S).
  */
+
+#define MDL_DERIVATIVES  /* Change to #undef to remove function */
+#if defined(MDL_DERIVATIVES)
+
 static void mdlDerivatives(SimStruct *S)
 {
     
 }
-
-
-/* Define to indicate that this S-Function has the mdlG[S]etSimState methods */
-
-
-/* Function: mdlGetSimState =====================================================
- * Abstract:
- *
- */
-static mxArray* mdlGetSimState(SimStruct* S)
-{
-    //Retrieve C++ object from the pointers vector
-    return mxCreateDoubleScalar(0);
-}
-/* Function: mdlGetSimState =====================================================
- * Abstract:
- *
- */
-static void mdlSetSimState(SimStruct* S, const mxArray* ma)
-{
-    
-}
+#endif
 
 // Function: mdlTerminate =====================================================
 // Abstract:
@@ -201,9 +184,10 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-    PAmsAddr  pAddr = (PAmsAddr) ssGetPWork(S)[0];
-    ADS_variable* var =(ADS_variable*) ssGetPWork(S)[1];
-    ADS_release_handler(pAddr, var);
+    PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
+    ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
+    //ADS_release_handler(pAddr, var);
+ 
     
     delete pAddr;
     delete var;
