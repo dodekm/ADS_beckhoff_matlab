@@ -34,7 +34,7 @@ ADS_open_mex();
 for i=1:N
 
     t(i)=i*Tvz;
-    u(i)=30000;
+    u(i)=30000*i/N;
     ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,20000);
     ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,u(i));
     y(i)=ADS_read_mex([10, 3, 1, 138, 3, 1],snimac_name,TC_INT_type);
