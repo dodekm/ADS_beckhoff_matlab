@@ -1,6 +1,9 @@
 
+%skript na demonstraciu pouzitia MEX funkcii pre citanie a zapis premennych
+
 clear all;
 close all;
+
 TC_BOOL_type=0
 TC_BYTE_type=1
 TC_WORD_type=2
@@ -19,7 +22,7 @@ pause on
 
 ventilator_name='GVL.ventilator';
 spirala_name='GVL.spirala';
-snimac_name='GVL.snimac1';
+snimac_name='GVL.snimac';
 
 Tvz=1/10;
 T_mer=10;
@@ -30,12 +33,15 @@ u=zeros(1,N);
 t=zeros(1,N);
 
 ADS_open_mex();
-%ADS_info_mex([10, 3, 1, 138, 3, 1]);
+
+spirala_in=20000;
+ventilator_in=20000;
+
 for i=1:N
 
     t(i)=i*Tvz;
-    u(i)=30000*i/N;
-    ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,20000);
+    u(i)=30000*spirala_in;
+    ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,ventilator_in);
     ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,u(i));
     y(i)=ADS_read_mex([10, 3, 1, 138, 3, 1],snimac_name,TC_INT_type);
     pause(Tvz);

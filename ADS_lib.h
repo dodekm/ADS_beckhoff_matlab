@@ -73,13 +73,6 @@ typedef struct
 
 
 
-
-typedef struct 
-{
-
-}
-TC_server_variables;
-
 unsigned long TC_type_size(TC_type data_type);
 AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6);
 
@@ -111,17 +104,6 @@ ADS_variable ADS_construct_variable(PAdsSymbolEntry symbol_entry);
 std::vector<ADS_variable>ADS_get_variables(AdsSymbolUploadInfo symbolInfo, PAdsSymbolEntry symbol_entry);
 
 /*
-std::map<long, std::string>ads_error_names
-{
-	{(0x00 + ERR_ADSERRS),"ADSERR_DEVICE_ERROR"},
-	{(0x01 + ERR_ADSERRS),"ADSERR_DEVICE_SRVNOTSUPP"},
-	{(0x02 + ERR_ADSERRS),"ADSERR_DEVICE_INVALIDGRP"},
-	{(0x03 + ERR_ADSERRS),"ADSERR_DEVICE_INVALIDOFFSET"}
-
-};
-*/
-
-
 template <typename	type>
         class ADS_template_variable
 {
@@ -221,7 +203,7 @@ template <typename	type>
     return nErr;
     
 }
-
+*/
 
 
 

@@ -16,8 +16,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
         mexErrMsgTxt("zly_pocet_vstupnych/vystupnych_argumentov");
         return;
     }
-    
-    
+     
     ADS_open();
     
     
