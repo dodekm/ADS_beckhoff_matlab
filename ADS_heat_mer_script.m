@@ -30,7 +30,7 @@ u=zeros(1,N);
 t=zeros(1,N);
 
 ADS_open_mex();
-
+%ADS_info_mex([10, 3, 1, 138, 3, 1]);
 for i=1:N
 
     t(i)=i*Tvz;

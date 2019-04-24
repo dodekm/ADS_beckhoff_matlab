@@ -57,12 +57,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
       
     AmsAddr   Addr;
 	PAmsAddr  pAddr = &Addr;
-	if(ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3))
-    {
-        mexErrMsgTxt("ADS_connect_error");
-        return;
-    }
-    
+	ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
     
     ADS_variable var;
     ADS_init_var(&var, var_name,type);
