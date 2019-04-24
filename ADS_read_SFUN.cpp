@@ -34,7 +34,7 @@
 //    block's characteristics (number of inputs, outputs, states, etc.).
 static void mdlInitializeSizes(SimStruct *S)
 {
-   ssSetNumSFcnParams(S, N_PARAMS); 
+    ssSetNumSFcnParams(S, N_PARAMS);
     if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) {
         /* Return if number of expected != number of actual parameters */
         return;
@@ -75,17 +75,17 @@ static void mdlInitializeSampleTimes(SimStruct *S)
 }
 
 #define MDL_START  /* Change to #undef to remove function */
-#if defined(MDL_START) 
+#if defined(MDL_START)
 
 static void mdlStart(SimStruct *S)
 {
- 
+    
     PAmsAddr  pAddr = (AmsAddr*) new AmsAddr;
     ADS_variable* var = (ADS_variable*) new ADS_variable;
     
     ssSetPWorkValue(S, 0, (void *)pAddr);
     ssSetPWorkValue(S, 1, (void *)var);
-       
+    
     const mxArray* mx_ipadress=IP_ADRESS_PARAM(S);
     const mxArray* mx_var_name=VAR_NAME_PARAM(S);
     const mxArray* mx_var_type=VAR_TYPE_PARAM(S);
@@ -118,7 +118,6 @@ static void mdlStart(SimStruct *S)
         return;
     }
     
-    
     TC_type type = (TC_type)mxGetScalar(mx_var_type);
     ADS_init(pAddr, 0, ADS_create_ip(netid[0], netid[1], netid[2],netid[3], netid[4], netid[5]), AMSPORT_R0_PLC_TC3);
     ADS_init_var(var, var_name,type);
@@ -126,7 +125,7 @@ static void mdlStart(SimStruct *S)
     
     
 }
-#endif 
+#endif
 
 
 // Function: mdlOutputs =======================================================
@@ -137,13 +136,12 @@ static void mdlOutputs(SimStruct *S,int_T tid)
 {
     PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
     ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
-   
     
     // Get data addresses of I/O
-    //InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
+    InputRealPtrsType  u = ssGetInputPortRealSignalPtrs(S,0);
     real_T *y = ssGetOutputPortRealSignal(S, 0);
     ADS_variable_read(pAddr, var);
-    //*y=ADS_var_value_get_double(var);
+    *y=ADS_var_value_get_double(var);
     
 }
 
@@ -186,12 +184,10 @@ static void mdlTerminate(SimStruct *S)
 {
     PAmsAddr  pAddr = (PAmsAddr) ssGetPWorkValue(S, 0);
     ADS_variable* var =(ADS_variable*) ssGetPWorkValue(S, 1);
-    //ADS_release_handler(pAddr, var);
- 
+    ADS_release_handler(pAddr, var);
     
     delete pAddr;
     delete var;
-    
 }
 
 // Required S-function trailer

@@ -2,6 +2,9 @@
 #include <iostream>
 #include <string>
 #include <windows.h>
+#include <vector>
+#include <map>
+#include <string>
 
 #include "TcAdsDef.h"
 #include "TcAdsApi.h"
@@ -47,6 +50,8 @@ typedef struct
     TC_type					data_type;
     unsigned long			data_type_size;
     
+	AdsSymbolEntry symbol_entry;
+
     union
     {
         TC_BOOL TC_BOOL_data;
@@ -65,6 +70,56 @@ typedef struct
     };
     
 }ADS_variable;
+
+
+
+
+typedef struct 
+{
+
+}
+TC_server_variables;
+
+unsigned long TC_type_size(TC_type data_type);
+AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6);
+
+long ADS_open();
+long ADS_close();
+long ADS_init(PAmsAddr pAddr, bool use_local, AmsNetId ipadress, unsigned short port);
+
+long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var);
+long ADS_variable_read(PAmsAddr  pAddr, ADS_variable* var);
+double ADS_variable_read_by_name(PAmsAddr  pAddr, ADS_variable* var);
+
+void ADS_init_var(ADS_variable* var, const std::string variable_name, TC_type data_type);
+long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var);
+
+double ADS_var_value_get_double(ADS_variable* var);
+void ADS_var_value_set_double(ADS_variable* var, double val);
+
+void ADS_stop_plc(PAmsAddr  pAddr);
+void ADS_start_plc(PAmsAddr  pAddr);
+
+void ADS_destroy_var(ADS_variable* var);
+
+AdsSymbolUploadInfo ADS_all_num_and_size(PAmsAddr pAddr);
+PAdsSymbolEntry ADS_all_var_info_read(PAmsAddr pLocalAdress, AdsSymbolUploadInfo symbolInfo);
+
+TC_type ADS_get_TC_type_from_symbol_entry(PAdsSymbolEntry symbol_entry);
+ADS_variable ADS_construct_variable(PAdsSymbolEntry symbol_entry);
+
+std::vector<ADS_variable>ADS_get_variables(AdsSymbolUploadInfo symbolInfo, PAdsSymbolEntry symbol_entry);
+
+/*
+std::map<long, std::string>ads_error_names
+{
+	{(0x00 + ERR_ADSERRS),"ADSERR_DEVICE_ERROR"},
+	{(0x01 + ERR_ADSERRS),"ADSERR_DEVICE_SRVNOTSUPP"},
+	{(0x02 + ERR_ADSERRS),"ADSERR_DEVICE_INVALIDGRP"},
+	{(0x03 + ERR_ADSERRS),"ADSERR_DEVICE_INVALIDOFFSET"}
+
+};
+*/
 
 
 template <typename	type>
@@ -169,25 +224,7 @@ template <typename	type>
 
 
 
-unsigned long TC_type_size(TC_type data_type);
-AmsNetId ADS_create_ip(unsigned char ip_1, unsigned char ip_2, unsigned char ip_3, unsigned char ip_4, unsigned char ip_5, unsigned char ip_6);
 
-long ADS_open();
-long ADS_close();
-long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short port);
-
-long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var);
-long ADS_variable_read(PAmsAddr  pAddr, ADS_variable* var);
-void ADS_init_var(ADS_variable* var, const std::string variable_name, TC_type data_type);
-long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var);
-
-double ADS_var_value_get_double(ADS_variable* var);
-void ADS_var_value_set_double(ADS_variable* var,double val);
-
-void ADS_stop_plc(PAmsAddr  pAddr);
-void ADS_start_plc(PAmsAddr  pAddr);
-
-void ADS_destroy_var(ADS_variable* var);
 
 
 

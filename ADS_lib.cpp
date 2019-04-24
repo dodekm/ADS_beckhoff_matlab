@@ -71,15 +71,16 @@ long ADS_open()
     return nPort;
 }
 
+
 long ADS_close()
 {
     return AdsPortClose();
 }
 
-long ADS_init(PAmsAddr pAddr, int use_local, AmsNetId ipadress, unsigned short port)
+long ADS_init(PAmsAddr pAddr, bool use_local, AmsNetId ipadress, unsigned short port)
 {
     long    nErr;
-    if (use_local)
+    if (use_local==true)
     {
         nErr = AdsGetLocalAddress(pAddr);
         return nErr;
@@ -116,12 +117,13 @@ long ADS_variable_read(PAmsAddr  pAddr, ADS_variable* var)
 {
     long    nErr;
     
-    if (var->lHdlVar == 0)
+    if (var->lHdlVar == 0 && !var->name.empty())
     {
         nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), var->name.length(), (void*)var->name.c_str());
         if (nErr)
             return nErr;
     }
+	if (var->lHdlVar != 0)
     nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_VALBYHND, var->lHdlVar, var->data_type_size, var->data_pointer);
     if (nErr)
         return nErr;
@@ -132,12 +134,13 @@ long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var)
 {
     long    nErr;
     
-    if (var->lHdlVar == 0)
+    if (var->lHdlVar == 0 && !var->name.empty())
     {
         nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_HNDBYNAME, 0x0, sizeof(var->lHdlVar), &(var->lHdlVar), var->name.length(), (void*)var->name.c_str());
         if (nErr)
             return nErr;
     }
+	if(var->lHdlVar!=0)
     nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_VALBYHND, var->lHdlVar, var->data_type_size, var->data_pointer);
     if (nErr)
         return nErr;
@@ -145,12 +148,25 @@ long ADS_variable_write(PAmsAddr  pAddr, ADS_variable* var)
 }
 
 
+double ADS_variable_read_by_name(PAmsAddr  pAddr, ADS_variable* var)
+{
+	long    nErr;
+
+	if (var->lHdlVar == 0 && !var->name.empty())
+	{
+		nErr = AdsSyncReadWriteReq(pAddr, ADSIGRP_SYM_VALBYNAME, 0x0, var->data_type_size, var->data_pointer, var->name.length(), (void*)var->name.c_str());
+		if (nErr)
+			return ADS_var_value_get_double(var);
+	}
+	return 0;
+}
 
 
 long ADS_release_handler(PAmsAddr  pAddr, ADS_variable* var)
 {
     
     long    nErr;
+	if(var->lHdlVar != 0)
     nErr = AdsSyncWriteReq(pAddr, ADSIGRP_SYM_RELEASEHND, 0, sizeof(var->lHdlVar), &(var->lHdlVar));
     var->lHdlVar = 0;
     return nErr;
@@ -256,3 +272,60 @@ void ADS_var_value_set_double(ADS_variable* var, double val)
     }
 }
 
+AdsSymbolUploadInfo ADS_all_num_and_size(PAmsAddr pAddr)
+{
+	long nErr;
+	AdsSymbolUploadInfo symbolInfo;
+	nErr = AdsSyncReadReq(pAddr, ADSIGRP_SYM_UPLOADINFO, 0, sizeof(symbolInfo), &symbolInfo);
+	return symbolInfo;
+}
+PAdsSymbolEntry ADS_alloc_space_for_AdsSymbolEntry(AdsSymbolUploadInfo symbolInfo)
+{
+	return (PAdsSymbolEntry) new char[symbolInfo.nSymSize];
+}
+
+
+PAdsSymbolEntry ADS_all_var_info_read(PAmsAddr pLocalAdress, AdsSymbolUploadInfo symbolInfo)
+{
+	long nErr;
+	PAdsSymbolEntry pSymbolEntry=ADS_alloc_space_for_AdsSymbolEntry(symbolInfo);
+	nErr = AdsSyncReadReq(pLocalAdress, ADSIGRP_SYM_UPLOAD, 0, symbolInfo.nSymSize, pSymbolEntry);
+	return pSymbolEntry;
+}
+
+
+TC_type ADS_get_TC_type_from_symbol_entry(PAdsSymbolEntry symbol_entry)
+{
+	return (TC_type) symbol_entry->dataType;
+}
+
+ADS_variable ADS_construct_variable(PAdsSymbolEntry symbol_entry)
+{
+	ADS_variable  symbol;
+	symbol.symbol_entry = *symbol_entry;
+	std::string symbol_name = std::string((PADSSYMBOLNAME(symbol_entry)));
+	std::string symbol_type = std::string((PADSSYMBOLTYPE(symbol_entry)));
+
+	TC_type type = ADS_get_TC_type_from_symbol_entry(symbol_entry);
+
+	ADS_init_var(&symbol, symbol_name, type);
+	return symbol;
+}
+
+
+
+std::vector<ADS_variable>ADS_get_variables(AdsSymbolUploadInfo symbolInfo, PAdsSymbolEntry symbol_entry)
+{
+	std::vector<ADS_variable> variables;
+	for (int i = 0; i < (symbolInfo.nSymbols); i++)
+	{
+		
+		ADS_variable  symbol = ADS_construct_variable(symbol_entry);
+		variables.push_back(symbol);
+		symbol_entry = PADSNEXTSYMBOLENTRY(symbol_entry);
+	}
+	if(symbol_entry!=NULL)
+	free (symbol_entry);
+	return variables;
+
+}

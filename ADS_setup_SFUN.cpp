@@ -33,7 +33,6 @@ static void mdlInitializeSizes(SimStruct *S)
     
     if (!ssSetNumOutputPorts(S, 0)) return;
     
-    
     ssSetNumSampleTimes(S, 1);
     ssSetNumRWork(S, 0);
     ssSetNumIWork(S, 0);
@@ -60,11 +59,7 @@ static void mdlInitializeSampleTimes(SimStruct *S)
     ssSetModelReferenceSampleTimeDefaultInheritance(S);
 }
 
-static void mdlInitializeConditions(SimStruct *S)
-{
-    
-    
-}
+
 
 
 // Function: mdlStart =======================================================
@@ -73,13 +68,15 @@ static void mdlInitializeConditions(SimStruct *S)
 //   have states that should be initialized once, this is the place
 //   to do it.
 
+#define MDL_START  /* Change to #undef to remove function */
+#if defined(MDL_START)
 static void mdlStart(SimStruct *S)
 {
     
-   ADS_open();
+    ADS_open();
     
 }
-
+#endif
 // Function: mdlOutputs =======================================================
 // Abstract:
 //   In this function, you compute the outputs of your S-function
@@ -97,20 +94,7 @@ static void mdlOutputs(SimStruct *S,int_T tid)
  *    for performing any tasks that should only take place once per
  *    integration step.
  */
-static void mdlUpdate(SimStruct *S, int_T tid)
-{
-    
-}
 
-/* Function: mdlDerivatives =================================================
- * Abstract:
- *    In this function, you compute the S-function block's derivatives.
- *    The derivatives are placed in the derivative vector, ssGetdX(S).
- */
-static void mdlDerivatives(SimStruct *S)
-{
-    
-}
 
 
 /* Define to indicate that this S-Function has the mdlG[S]etSimState methods */
@@ -141,7 +125,7 @@ static void mdlSetSimState(SimStruct* S, const mxArray* ma)
 //   allocated in mdlStart, this is the place to free it.
 static void mdlTerminate(SimStruct *S)
 {
-   
+    
     ADS_close();
 }
 

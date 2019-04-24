@@ -60,7 +60,7 @@ void mexFunction(int nlhs,mxArray *plhs[],int nrhs,const mxArray *prhs[])
     }
     
     double inValue = mxGetScalar(mx_var_value);
-    TC_type type = (TC_type)mxGetScalar(mx_var_type);
+    TC_type type = static_cast<TC_type>(mxGetScalar(mx_var_type));
     
     AmsAddr   Addr;
     PAmsAddr  pAddr = &Addr;
