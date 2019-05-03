@@ -1,5 +1,9 @@
 
-%ciselne oznacenie datovych typov v TC
+%ciselne oznacenie datovych typov v TwinCAT 
+%identifikacne cisla datovych typov su nutne pri volani MEX funkcii a
+%rovnako aj pri nastavovani S funkcii
+%pre spravne fungovanie komunikacie (citanie a zapis) premennych je nutne
+%zistit si v TwinCAT akeho datoveho typu premenna je
 
 TC_BOOL_type=0
 TC_BYTE_type=1

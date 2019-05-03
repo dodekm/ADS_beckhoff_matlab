@@ -1,4 +1,5 @@
 %skript na kompilaciu MEX funkcii a S funkcii
+%prislsne kniznice a hlavickove subory musia byt adresari, kde sa kompiluje
 
 mex ('ADS_write_mex.cpp','ADS_lib.cpp',strcat('-L',pwd()),'-lTcAdsDll')
 mex ('ADS_read_mex.cpp','ADS_lib.cpp',strcat('-L',pwd()),'-lTcAdsDll')

@@ -20,10 +20,6 @@ TC_LREAL_type=12
 
 pause on 
 
-ventilator_name='GVL.ventilator';
-spirala_name='GVL.spirala';
-snimac_name='GVL.snimac';
-
 Tvz=1/10;
 T_mer=10;
 N=floor(T_mer/Tvz);
@@ -32,10 +28,14 @@ y=zeros(1,N);
 u=zeros(1,N);
 t=zeros(1,N);
 
-ADS_open_mex();
-
 spirala_in=20000;
 ventilator_in=20000;
+
+ADS_open_mex();
+
+ventilator_name='GVL.ventilator';
+spirala_name='GVL.spirala';
+snimac_name='GVL.snimac';
 
 for i=1:N
 
@@ -47,10 +47,10 @@ for i=1:N
     pause(Tvz);
 
 end
-
 ADS_write_mex([10, 3, 1, 138, 3, 1],ventilator_name,TC_INT_type,0);
 ADS_write_mex([10, 3, 1, 138, 3, 1],spirala_name,TC_INT_type,0);
 ADS_close_mex();
+
 figure(); 
 plot(t,y,'LineWidth',2)
 hold on
