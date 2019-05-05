@@ -4,20 +4,7 @@
 clear all;
 close all;
 
-TC_BOOL_type=0
-TC_BYTE_type=1
-TC_WORD_type=2
-TC_DWORD_type=3
-TC_INT_type=4
-TC_DINT_type=5
-TC_LINT_type=6
-TC_USINT_type=7
-TC_UINT_type=8
-TC_UDINT_type=9
-TC_ULINT_type=10
-TC_REAL_type=11
-TC_LREAL_type=12
-
+TC_data_types
 pause on 
 
 Tvz=1/10;
